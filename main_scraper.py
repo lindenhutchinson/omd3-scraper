@@ -2,15 +2,17 @@ from omd_url_scraper import OMDUrlScraper
 from omd_details_scraper import OMDDetailsScraper
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 BASE_URL = "https://orcsmustdie.fandom.com"
 URL_DIR = "./item_urls"
+DETAILS_DIR = "./details"
+
 URL_FILES = {
     "weapons": f"{URL_DIR}/weapon_list.json",
     "trinkets": f"{URL_DIR}/trinket_list.json",
     "traps": f"{URL_DIR}/trap_list.json"
 }
-DETAILS_DIR = "./details"
 DETAILS_FILES = {
     "weapons": f"{DETAILS_DIR}/weapon_details.json",
     "trinkets": f"{DETAILS_DIR}/trinket_details.json",
@@ -32,6 +34,13 @@ def ensure_url_file(category):
         scraper = OMDUrlScraper(CATEGORY_URLS[category], url_file)
         scraper.scrape()
 
+def scrape_detail(url):
+    """Scrapes details for a single URL."""
+    full_url = f"{BASE_URL}{url}"
+    scraper = OMDDetailsScraper(full_url)
+    scraper.scrape()
+    return scraper.get_trap_data()
+
 def scrape_details(category):
     url_file = URL_FILES[category]
     details_file = DETAILS_FILES[category]
@@ -50,12 +59,10 @@ def scrape_details(category):
         with open(details_file, "r") as fn:
             all_data = json.load(fn)
     
-    for url in all_trap_urls:
-        full_url = f"{BASE_URL}{url}"
-        scraper = OMDDetailsScraper(full_url)
-        scraper.scrape()
-        data = scraper.get_trap_data()
-        all_data.append(data)
+    with ThreadPoolExecutor(max_workers=5) as executor:  # Adjust workers as needed
+        results = list(executor.map(scrape_detail, all_trap_urls))
+    
+    all_data.extend(results)
     
     with open(details_file, "w") as fn:
         json.dump(all_data, fn, indent=4)
