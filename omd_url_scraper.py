@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 
-class OMDScraper:
+class OMDUrlScraper:
     def __init__(self, url, filename):
         self.url = url
         self.filename = filename
@@ -65,12 +65,11 @@ class OMDScraper:
         return self.all_scenarios, self.war_scenarios
 
 
-# Example usage:
 if __name__ == "__main__":
     # url = "https://orcsmustdie.fandom.com/wiki/Category:Traps_(OMD3)"
     # url = "https://orcsmustdie.fandom.com/wiki/Category:Trinkets_(OMD3)"
     url = "https://orcsmustdie.fandom.com/wiki/Category:Weapons_(OMD3)"
     filename = "weapon_list.json"
     
-    scraper = OMDScraper(url, filename)
+    scraper = OMDUrlScraper(url, filename)
     scraper.scrape()

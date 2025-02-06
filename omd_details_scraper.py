@@ -5,7 +5,7 @@ import csv
 import os
 
 
-class DetailScraper:
+class OMDDetailsScraper:
     def __init__(self, url):
         self.url = url
         self.trap_data = {}
@@ -118,7 +118,7 @@ class DetailScraper:
 # Example usage:
 if __name__ == "__main__":
     url = "https://orcsmustdie.fandom.com/wiki/Acid_Geyser_(OMD3)"  # Replace with actual URL
-    scraper = DetailScraper(url)
+    scraper = OMDDetailsScraper(url)
     scraper.scrape()
     
     trap_info = scraper.get_trap_data()
